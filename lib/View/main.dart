@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:indt_challenge/View/adm_form.dart';
 import 'package:indt_challenge/View/user_form.dart';
+import 'package:indt_challenge/View/adm_list.dart';
 import 'package:indt_challenge/View/user_list.dart';
 import 'package:indt_challenge/View/user_login.dart';
 import 'package:indt_challenge/View/user_provider.dart';
@@ -13,8 +14,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
    return UserProvider(
@@ -24,8 +23,8 @@ class MyApp extends StatelessWidget {
         routes: {
           "/createAdm": (_) => AdmForm(),
           "/createUser": (_) => UserForm(),
-
-          "/List": (_) => UserList(),
+          "/admList": (_) => AdmList(),
+          "/userList": (_) => UserList(),
           "/view": (_) => UserView(),
           "/login": (_) => UserLogin(),
         },

@@ -30,31 +30,6 @@ class UserList extends StatelessWidget {
                   title: Text(users[indexBuilder].name),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            userProvider.indexUser = null;
-                            userProvider.userSelected = users[indexBuilder];
-                            userProvider.indexUser = indexBuilder;
-                            Navigator.popAndPushNamed(context, "/createAdm");
-                          },
-                          icon: Icon(Icons.edit)),
-                      IconButton(
-                          onPressed: () {
-                            userProvider.indexUser = null;
-                            userProvider.userSelected = users[indexBuilder];
-                            userProvider.indexUser = indexBuilder;
-                            Navigator.popAndPushNamed(context, "/view");
-                          },
-                          icon: Icon(Icons.visibility, color: Colors.blue)),
-                      IconButton(
-                          onPressed: () {
-                            userProvider.indexUser = null;
-                            userProvider.users.removeAt(indexBuilder);
-                            Navigator.popAndPushNamed(context, "/createAdm");
-                          },
-                          icon: Icon(Icons.delete, color: Colors.red))
-                    ],
                   ),
                 ),
                 decoration: BoxDecoration(

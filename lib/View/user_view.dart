@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:indt_challenge/View/filed_form.dart';
 import 'package:indt_challenge/View/user_provider.dart';
 
-
 class UserView extends StatelessWidget {
   UserView({super.key});
 
   String title = "Show User";
+  TextEditingController controllerLevelUser = TextEditingController();
   TextEditingController controllerName = TextEditingController();
+  TextEditingController controllerSurName = TextEditingController();
   TextEditingController controllerEmail = TextEditingController();
   TextEditingController controllerPassword = TextEditingController();
 
@@ -18,7 +19,9 @@ class UserView extends StatelessWidget {
     int? index;
     if (userProvider.indexUser != null) {
       index = userProvider.indexUser;
+      controllerLevelUser.text = userProvider.userSelected!.level;
       controllerName.text = userProvider.userSelected!.name;
+      controllerSurName.text = userProvider.userSelected!.surname;
       controllerEmail.text = userProvider.userSelected!.email;
       controllerPassword.text = userProvider.userSelected!.password;
     }
@@ -31,7 +34,7 @@ class UserView extends StatelessWidget {
             child: TextButton(
               child: Text("UserList"),
               onPressed: () {
-                Navigator.popAndPushNamed(context, "/List");
+                Navigator.popAndPushNamed(context, "/admList");
               },
             ),
             decoration: BoxDecoration(
@@ -45,9 +48,19 @@ class UserView extends StatelessWidget {
         child: Column(
           children: [
             FieldForm(
+                label: "Level",
+                isPasword: false,
+                controller: controllerLevelUser,
+                isForm: false),
+            FieldForm(
                 label: "Name",
                 isPasword: false,
                 controller: controllerName,
+                isForm: false),
+            FieldForm(
+                label: "SurName",
+                isPasword: false,
+                controller: controllerSurName,
                 isForm: false),
             FieldForm(
                 label: "Email",

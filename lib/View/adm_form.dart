@@ -1,11 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/filed_form.dart';
 import 'package:indt_challenge/View/user_provider.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdmForm extends StatefulWidget {
-  const AdmForm({super.key});
+  const AdmForm({Key? key});
 
   @override
   State<AdmForm> createState() => _UserFormState();
@@ -34,34 +36,44 @@ class _UserFormState extends State<AdmForm> {
         this.title = "Edit User";
       });
     }
-    void save() {
+    void save() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      // Salvar os dados do usuário usando SharedPreferences
+      prefs.setString('leveluser', controllerName.text);
+      prefs.setString('name', controllerName.text);
+      prefs.setString('surname', controllerSurName.text);
+      prefs.setString('email', controllerEmail.text);
+      prefs.setString('password', controllerPassword.text);
+
       User user = User(
-          level: controllerName.text,
-          name: controllerName.text,
-          surname: controllerName.text,
-          email: controllerEmail.text,
-          password: controllerPassword.text);
+        level: controllerName.text,
+        name: controllerName.text,
+        surname: controllerName.text,
+        email: controllerEmail.text,
+        password: controllerPassword.text,
+      );
 
       if (index != null) {
         userProvider.users[index] = user;
       } else {
         int usersLength = userProvider.users.length;
-
         userProvider.users.insert(usersLength, user);
       }
 
-      Navigator.popAndPushNamed(context, "/List");
+      Navigator.popAndPushNamed(context, "/admList");
     }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(this.title),
+        automaticallyImplyLeading: false,
         actions: [
           Container(
             child: TextButton(
               child: Text("UserList"),
               onPressed: () {
-                Navigator.popAndPushNamed(context, "/List");
+                Navigator.popAndPushNamed(context, "/admList");
               },
             ),
             decoration: BoxDecoration(
@@ -74,16 +86,23 @@ class _UserFormState extends State<AdmForm> {
       body: Center(
         child: Column(
           children: [
-             FieldForm(
-                label: "Level", isPasword: false, controller: controllerlevelUser),
+            FieldForm(
+                label: "Level",
+                isPasword: false,
+                controller: controllerlevelUser),
             FieldForm(
                 label: "Name", isPasword: false, controller: controllerName),
+                
             FieldForm(
-                label: "Surname", isPasword: false, controller: controllerSurName),
+                label: "Surname",
+                isPasword: false,
+                controller: controllerSurName),
             FieldForm(
                 label: "Email", isPasword: false, controller: controllerEmail),
             FieldForm(
-                label: "Password", isPasword: true, controller: controllerPassword),
+                label: "Password",
+                isPasword: true,
+                controller: controllerPassword),
             SizedBox(
               width: double.infinity,
               child: TextButton(

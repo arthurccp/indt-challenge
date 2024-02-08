@@ -1,10 +1,42 @@
 import 'package:flutter/material.dart';
 
 class UserLogin extends StatelessWidget {
-  const UserLogin({super.key});
+  const UserLogin({Key? key});
+
+  // Função para realizar o login
+  void login(BuildContext context, String username, String password) {
+    // Substitua esta lógica com sua própria validação de credenciais
+    // Aqui, estou apenas comparando com credenciais fixas.
+    if (username == 'admin' && password == 'admin') {
+      // Se as credenciais estiverem corretas, navegue para a próxima tela.
+      Navigator.pushNamed(context, '/createAdm');
+    } else {
+      // Caso contrário, exiba uma mensagem de erro.
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Erro de login'),
+            content: Text('Credenciais inválidas. Por favor, tente novamente.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController usernameController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
@@ -15,12 +47,14 @@ class UserLogin extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
+              controller: usernameController,
               decoration: InputDecoration(
                 labelText: 'Username',
               ),
             ),
             SizedBox(height: 16.0),
             TextField(
+              controller: passwordController,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
@@ -30,7 +64,13 @@ class UserLogin extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  login(
+                    context,
+                    usernameController.text,
+                    passwordController.text,
+                  );
+                },
                 child: Text("Login"),
                 style: ButtonStyle(
                   backgroundColor:
