@@ -1,17 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
+class AdmList extends StatefulWidget {
+  const AdmList({Key? key});
 
-class AdmList extends StatelessWidget {
-  const AdmList({super.key});
+  @override
+  State<AdmList> createState() => _AdmListState();
+}
+
+class _AdmListState extends State<AdmList> {
+  List<String> userNames = []; // Lista para armazenar apenas os nomes dos usuários
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserNames(); // Carrega os nomes dos usuários ao inicializar o widget
+  }
+
+  // Método para carregar apenas os nomes dos usuários
+  void loadUserNames() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? userStrings = prefs.getStringList('users');
+
+    if (userStrings != null) {
+      setState(() {
+        userNames = userStrings.map((userString) {
+          User user = User.fromJson(jsonDecode(userString));
+          return user.name; // Adiciona apenas o nome à lista
+        }).toList();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = UserProvider.of(context) as UserProvider;
-    List<User> users = userProvider.users;
-
-    int userLength = users.length;
 
     return Scaffold(
       appBar: AppBar(
@@ -24,42 +50,51 @@ class AdmList extends StatelessWidget {
         ),
       ),
       body: ListView.builder(
-          itemCount: userLength,
-          itemBuilder: (BuildContext contextBuilder, indexBuilder) => Container(
-                child: ListTile(
-                  title: Text(users[indexBuilder].name),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            userProvider.indexUser = null;
-                            userProvider.userSelected = users[indexBuilder];
-                            userProvider.indexUser = indexBuilder;
-                            Navigator.popAndPushNamed(context, "/createAdm");
-                          },
-                          icon: Icon(Icons.edit)),
-                      IconButton(
-                          onPressed: () {
-                            userProvider.indexUser = null;
-                            userProvider.userSelected = users[indexBuilder];
-                            userProvider.indexUser = indexBuilder;
-                            Navigator.popAndPushNamed(context, "/view");
-                          },
-                          icon: Icon(Icons.visibility, color: Colors.blue)),
-                      IconButton(
-                          onPressed: () {
-                            userProvider.indexUser = null;
-                            userProvider.users.removeAt(indexBuilder);
-                            Navigator.popAndPushNamed(context, "/createAdm");
-                          },
-                          icon: Icon(Icons.delete, color: Colors.red))
-                    ],
-                  ),
-                ),
-                decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(width: 0.4))),
-              )),
+        itemCount: userNames.length,
+        itemBuilder: (BuildContext context, int index) => ListTile(
+          title: Text(userNames[index]),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () {
+                  userProvider.indexUser = null;
+                  userProvider.userSelected = User(name: userNames[index], level: '', surname: '', email: '', password: '',); // Ajuste necessário
+                  userProvider.indexUser = index;
+                  Navigator.popAndPushNamed(context, "/createAdm");
+                },
+                icon: Icon(Icons.edit),
+              ),
+              IconButton(
+                onPressed: () {
+                  userProvider.indexUser = null;
+                  userProvider.userSelected = User(name: userNames[index], level: '', surname: '', email: '', password: ''); // Ajuste necessário
+                  userProvider.indexUser = index;
+                  Navigator.popAndPushNamed(context, "/view");
+                },
+                icon: Icon(Icons.visibility, color: Colors.blue),
+              ),
+              IconButton(
+                onPressed: () {
+                  userProvider.indexUser = null;
+                  setState(() {
+                    userNames.removeAt(index);
+                  });
+                  saveUserNamesToSharedPreferences(); // Atualiza a lista de nomes salva no SharedPreferences
+                },
+                icon: Icon(Icons.delete, color: Colors.red),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
+  }
+
+  // Método para salvar a lista de nomes de usuários no SharedPreferences
+  void saveUserNamesToSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> userStrings = userNames.map((userName) => '{"name": "$userName"}').toList(); // Formata o nome como JSON
+    prefs.setStringList('users', userStrings);
   }
 }

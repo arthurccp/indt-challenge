@@ -36,33 +36,32 @@ class _UserFormState extends State<AdmForm> {
         this.title = "Edit User";
       });
     }
-    void save() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+  void save() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      // Salvar os dados do usuário usando SharedPreferences
-      prefs.setString('leveluser', controllerName.text);
-      prefs.setString('name', controllerName.text);
-      prefs.setString('surname', controllerSurName.text);
-      prefs.setString('email', controllerEmail.text);
-      prefs.setString('password', controllerPassword.text);
+    User user = User(
+      level: controllerlevelUser.text,
+      name: controllerName.text,
+      surname: controllerSurName.text,
+      email: controllerEmail.text,
+      password: controllerPassword.text,
+    );
 
-      User user = User(
-        level: controllerName.text,
-        name: controllerName.text,
-        surname: controllerName.text,
-        email: controllerEmail.text,
-        password: controllerPassword.text,
-      );
+    List<String> userStrings = prefs.getStringList('users') ?? [];
+    userStrings.add(jsonEncode(user.toJson()));
 
-      if (index != null) {
-        userProvider.users[index] = user;
-      } else {
-        int usersLength = userProvider.users.length;
-        userProvider.users.insert(usersLength, user);
-      }
+    prefs.setStringList('users', userStrings);
 
-      Navigator.popAndPushNamed(context, "/admList");
+    if (index != null) {
+      userProvider.users[index] = user;
+    } else {
+      int usersLength = userProvider.users.length;
+      userProvider.users.insert(usersLength, user);
     }
+
+    Navigator.popAndPushNamed(context, "/admList");
+  }
+
 
     return Scaffold(
       appBar: AppBar(
@@ -92,7 +91,6 @@ class _UserFormState extends State<AdmForm> {
                 controller: controllerlevelUser),
             FieldForm(
                 label: "Name", isPasword: false, controller: controllerName),
-                
             FieldForm(
                 label: "Surname",
                 isPasword: false,
