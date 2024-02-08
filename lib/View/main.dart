@@ -21,12 +21,12 @@ class MyApp extends StatelessWidget {
         title: 'CRUD_APP',
         home: UserLogin(),
         routes: {
-          "/createAdm": (_) => AdmForm(),
-          "/createUser": (_) => UserForm(),
-          "/admList": (_) => AdmList(),
-          "/userList": (_) => UserList(),
+          "/createAdm": (_) => const AdmForm(),
+          "/createUser": (_) => const UserForm(),
+          "/admList": (_) => const AdmList(),
+          "/userList": (_) => const UserList(), 
           "/view": (_) => UserView(),
-          "/login": (_) => UserLogin(),
+          "/login": (_) => const UserLogin(),
         },
       ),
     );

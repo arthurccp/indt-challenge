@@ -36,31 +36,32 @@ class _UserFormState extends State<AdmForm> {
         this.title = "Edit User";
       });
     }
-  void save() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    User user = User(
-      level: controllerlevelUser.text,
-      name: controllerName.text,
-      surname: controllerSurName.text,
-      email: controllerEmail.text,
-      password: controllerPassword.text,
-    );
+    void save() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    List<String> userStrings = prefs.getStringList('users') ?? [];
-    userStrings.add(jsonEncode(user.toJson()));
+      User user = User(
+        level: controllerlevelUser.text,
+        name: controllerName.text,
+        surname: controllerSurName.text,
+        email: controllerEmail.text,
+        password: controllerPassword.text,
+      );
 
-    prefs.setStringList('users', userStrings);
+      List<String> userStrings = prefs.getStringList('users') ?? [];
+      userStrings.add(jsonEncode(user.toJson()));
 
-    if (index != null) {
-      userProvider.users[index] = user;
-    } else {
-      int usersLength = userProvider.users.length;
-      userProvider.users.insert(usersLength, user);
+      prefs.setStringList('users', userStrings);
+
+      if (index != null) {
+        userProvider.users[index] = user;
+      } else {
+        int usersLength = userProvider.users.length;
+        userProvider.users.insert(usersLength, user);
+      }
+
+      Navigator.popAndPushNamed(context, "/admList");
     }
-
-    Navigator.popAndPushNamed(context, "/admList");
-  }
 
 
     return Scaffold(
