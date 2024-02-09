@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/filed_form.dart';
@@ -36,37 +38,30 @@ class _UserFormState extends State<UserForm> {
         this.title = "Edit User";
       });
     }
+    
     void save() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      // Salve os dados do usuário usando SharedPreferences
-      prefs.setString('leveluser', controllerlevelUser.text);
-      prefs.setString('name', controllerName.text);
-      prefs.setString('surname', controllerSurName.text);
-      prefs.setString('email', controllerEmail.text);
-      prefs.setString('password', controllerPassword.text);
+      User user = User(
+        level: controllerlevelUser.text,
+        name: controllerName.text,
+        surname: controllerSurName.text,
+        email: controllerEmail.text,
+        password: controllerPassword.text,
+      );
 
+      List<String> userStrings = prefs.getStringList('users') ?? [];
+      userStrings.add(jsonEncode(user.toJson()));
+
+      prefs.setStringList('users', userStrings);
+
+      print(prefs);
       if (index != null) {
-        User user = User(
-          level: controllerName.text,
-          name: controllerName.text,
-          surname: controllerName.text,
-          email: controllerEmail.text,
-          password: controllerPassword.text,
-        );
         userProvider.users[index] = user;
       } else {
-        User user = User(
-          level: controllerName.text,
-          name: controllerName.text,
-          surname: controllerName.text,
-          email: controllerEmail.text,
-          password: controllerPassword.text,
-        );
         int usersLength = userProvider.users.length;
         userProvider.users.insert(usersLength, user);
       }
-
       Navigator.popAndPushNamed(context, "/login");
     }
 
@@ -124,8 +119,9 @@ class _UserFormState extends State<UserForm> {
                 onPressed: save,
                 child: Text("Salvar"),
                 style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(Theme.of(context).primaryColor),
+                  backgroundColor: MaterialStateProperty.all(
+                    Theme.of(context).primaryColor,
+                  ),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
                 ),
               ),
