@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/filed_form.dart';
 import 'package:indt_challenge/View/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdmForm extends StatefulWidget {
   const AdmForm({Key? key});
@@ -56,11 +57,19 @@ class _UserFormState extends State<AdmForm> {
       Navigator.popAndPushNamed(context, "/admList");
     }
 
+    void clearSharedPreferences() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.clear();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        automaticallyImplyLeading: false,
         actions: [
+          IconButton(
+            onPressed: clearSharedPreferences,
+            icon: Icon(Icons.delete_forever),
+          ),
           Container(
             child: TextButton(
               child: Text("UserList"),
