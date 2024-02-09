@@ -9,10 +9,10 @@ class AdmForm extends StatefulWidget {
   const AdmForm({Key? key});
 
   @override
-  State<AdmForm> createState() => _UserFormState();
+  State<AdmForm> createState() => _AdmFormState();
 }
 
-class _UserFormState extends State<AdmForm> {
+class _AdmFormState extends State<AdmForm> {
   late TextEditingController controllerlevelUser;
   late TextEditingController controllerName;
   late TextEditingController controllerSurName;
@@ -27,6 +27,7 @@ class _UserFormState extends State<AdmForm> {
     controllerSurName = TextEditingController();
     controllerEmail = TextEditingController();
     controllerPassword = TextEditingController();
+    _loadUser();
   }
 
   @override
@@ -39,10 +40,33 @@ class _UserFormState extends State<AdmForm> {
     super.dispose();
   }
 
+  Future<void> _loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> userStrings = prefs.getStringList('users') ?? [];
+    if (userStrings.isNotEmpty) {
+      // Assuming only one user is stored for simplicity
+      User user = User.fromJson(jsonDecode(userStrings.first));
+      controllerlevelUser.text = user.level;
+      controllerName.text = user.name;
+      controllerSurName.text = user.surname;
+      controllerEmail.text = user.email;
+      controllerPassword.text = user.password;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = UserProvider.of(context) as UserProvider;
     String title = userProvider.indexUser != null ? "Edit User" : "Create User";
+
+    if (title == "Create User") {
+        // Limpar os inputs
+        controllerlevelUser.text = "";
+        controllerName.text = "";
+        controllerSurName.text = "";
+        controllerEmail.text = "";
+        controllerPassword.text = "";
+      }
 
     void save() {
       User user = User(
@@ -57,6 +81,14 @@ class _UserFormState extends State<AdmForm> {
       Navigator.popAndPushNamed(context, "/admList");
     }
 
+    void clearForm() {
+      controllerlevelUser.clear();
+      controllerName.clear();
+      controllerSurName.clear();
+      controllerEmail.clear();
+      controllerPassword.clear();
+    }
+
     void clearSharedPreferences() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.clear();
@@ -65,6 +97,7 @@ class _UserFormState extends State<AdmForm> {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
+        automaticallyImplyLeading: false, // Remover o botão de voltar
         actions: [
           IconButton(
             onPressed: clearSharedPreferences,
@@ -128,19 +161,9 @@ class _UserFormState extends State<AdmForm> {
             ),
             SizedBox(
               width: double.infinity,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  "Voltar ao Início",
-                  style: TextStyle(color: Colors.red),
-                ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                    Colors.white.withOpacity(0.8),
-                  ),
-                ),
+              child: ElevatedButton(
+                onPressed: clearForm,
+                child: Text("Limpar"),
               ),
             ),
           ],

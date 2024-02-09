@@ -13,11 +13,16 @@ class UserView extends StatelessWidget {
     final User? user = userProvider.userSelected;
     final int? index = userProvider.indexUser;
 
-    TextEditingController controllerLevelUser = TextEditingController(text: user?.level ?? '');
-    TextEditingController controllerName = TextEditingController(text: user?.name ?? '');
-    TextEditingController controllerSurName = TextEditingController(text: user?.surname ?? '');
-    TextEditingController controllerEmail = TextEditingController(text: user?.email ?? '');
-    TextEditingController controllerPassword = TextEditingController(text: user?.password ?? '');
+    TextEditingController controllerLevelUser =
+        TextEditingController(text: user?.level ?? '');
+    TextEditingController controllerName =
+        TextEditingController(text: user?.name ?? '');
+    TextEditingController controllerSurName =
+        TextEditingController(text: user?.surname ?? '');
+    TextEditingController controllerEmail =
+        TextEditingController(text: user?.email ?? '');
+    TextEditingController controllerPassword =
+        TextEditingController(text: user?.password ?? '');
 
     return Scaffold(
       appBar: AppBar(
@@ -25,7 +30,7 @@ class UserView extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.popAndPushNamed(context, "/admList");
           },
         ),
         actions: [
@@ -33,12 +38,12 @@ class UserView extends StatelessWidget {
             child: TextButton(
               child: Text("UserList"),
               onPressed: () {
-                Navigator.popAndPushNamed(context, "/admList");
+                Navigator.pop(context);
               },
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(8))),
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(8))),
             margin: EdgeInsets.all(8),
           )
         ],
@@ -84,7 +89,8 @@ class UserView extends StatelessWidget {
                 },
                 child: Text("Edit"),
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                  backgroundColor:
+                      MaterialStateProperty.all(Theme.of(context).primaryColor),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
                 ),
               ),

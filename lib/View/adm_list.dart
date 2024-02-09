@@ -4,7 +4,6 @@ import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/user_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class AdmList extends StatelessWidget {
   const AdmList({Key? key});
 
@@ -32,11 +31,26 @@ class AdmList extends StatelessWidget {
             if (users == null || users.isEmpty) {
               return Center(child: Text("No users found"));
             } else {
-              return ListView.builder(
-                itemCount: users.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return UserListItem(user: users[index], index: index);
-                },
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: users.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return UserListItem(user: users[index], index: index);
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false);
+                      },
+                      child: Text("Voltar ao Início"),
+                    ),
+                  ),
+                ],
               );
             }
           }

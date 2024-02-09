@@ -46,7 +46,7 @@ class _UserListState extends State<UserList> {
         title: Text("User List"),
       ),
       body: ListView.builder(
-        itemCount: users.length + 1, // +1 para adicionar o botão de voltar ao início
+        itemCount: users.length + 1,
         itemBuilder: (BuildContext context, int index) {
           if (index == users.length) {
             // Último item da lista, que é o botão "Voltar ao início"

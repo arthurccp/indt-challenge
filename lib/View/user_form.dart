@@ -21,22 +21,22 @@ class _UserFormState extends State<UserForm> {
   TextEditingController controllerPassword = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _clearControllers();
+  }
+
+  void _clearControllers() {
+    controllerlevelUser.clear();
+    controllerName.clear();
+    controllerSurName.clear();
+    controllerEmail.clear();
+    controllerPassword.clear();
+  }
+
+  @override
   Widget build(BuildContext context) {
     UserProvider userProvider = UserProvider.of(context) as UserProvider;
-
-    int? index;
-    if (userProvider.indexUser != null) {
-      index = userProvider.indexUser;
-      controllerlevelUser.text = userProvider.userSelected!.level;
-      controllerName.text = userProvider.userSelected!.name;
-      controllerSurName.text = userProvider.userSelected!.surname;
-      controllerEmail.text = userProvider.userSelected!.email;
-      controllerPassword.text = userProvider.userSelected!.password;
-
-      setState(() {
-        this.title = "Edit User";
-      });
-    }
 
     void save() async {
       User user = User(
@@ -47,26 +47,13 @@ class _UserFormState extends State<UserForm> {
         password: controllerPassword.text,
       );
 
-      await _saveUser(user);
-
-      if (index != null) {
-        userProvider.users[index] = user;
-      } else {
-        int usersLength = userProvider.users.length;
-        userProvider.users.insert(usersLength, user);
-      }
+      await _saveUser(user, userProvider);
       Navigator.popAndPushNamed(context, "/login");
     }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(this.title),
-        leading: BackButton(
-          onPressed: () {
-            userProvider.indexUser = null;
-            Navigator.popAndPushNamed(context, "/login");
-          },
-        ),
         actions: [
           Container(
             child: Text(""),
@@ -125,7 +112,7 @@ class _UserFormState extends State<UserForm> {
     );
   }
 
-  Future<void> _saveUser(User user) async {
+  Future<void> _saveUser(User user, UserProvider userProvider) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     List<String> userStrings = prefs.getStringList('users') ?? [];
