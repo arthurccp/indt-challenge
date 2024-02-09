@@ -36,14 +36,7 @@ class _UserListState extends State<UserList> {
     return Scaffold(
       appBar: AppBar(
         title: Text("User List"),
-        // Removendo o botão de voltar no topo da tela
-        // leading: BackButton(
-        //   onPressed: () {
-        //     UserProvider userProvider = UserProvider.of(context) as UserProvider;
-        //     userProvider.indexUser = null;
-        //     Navigator.popAndPushNamed(context, "/createAdm");
-        //   },
-        // ),
+
       ),
       body: ListView.builder(
         itemCount: users.length + 1, // +1 para adicionar o botão de voltar ao início
@@ -76,7 +69,7 @@ class _UserListState extends State<UserList> {
           onPressed: () {
             UserProvider userProvider = UserProvider.of(context) as UserProvider;
             userProvider.indexUser = null;
-            Navigator.popAndPushNamed(context, "/login");
+            Navigator.popAndPushNamed(context, "/createAdm");
           },
           child: Text('Voltar ao início'),
         ),

@@ -12,6 +12,13 @@ class AdmList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("ADM List"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+                Navigator.popAndPushNamed(context, "/createAdm");
+
+          },
+        ),
       ),
       body: FutureBuilder<List<User>>(
         future: _fetchUsersFromSharedPreferences(),
@@ -88,6 +95,7 @@ class AdmList extends StatelessWidget {
       return users;
     }
   }
+
   Future<void> _deleteUser(int index) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? userStrings = prefs.getStringList('users');
@@ -101,6 +109,4 @@ class AdmList extends StatelessWidget {
       await prefs.setStringList('users', updatedUserStrings);
     }
   }
-
-
 }
