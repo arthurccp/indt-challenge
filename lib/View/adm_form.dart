@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/filed_form.dart';
 import 'package:indt_challenge/View/user_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AdmForm extends StatefulWidget {
   const AdmForm({Key? key});
@@ -13,31 +12,38 @@ class AdmForm extends StatefulWidget {
 }
 
 class _UserFormState extends State<AdmForm> {
-  String title = "Create Userr";
-  TextEditingController controllerlevelUser = TextEditingController();
-  TextEditingController controllerName = TextEditingController();
-  TextEditingController controllerSurName = TextEditingController();
-  TextEditingController controllerEmail = TextEditingController();
-  TextEditingController controllerPassword = TextEditingController();
+  late TextEditingController controllerlevelUser;
+  late TextEditingController controllerName;
+  late TextEditingController controllerSurName;
+  late TextEditingController controllerEmail;
+  late TextEditingController controllerPassword;
+
+  @override
+  void initState() {
+    super.initState();
+    controllerlevelUser = TextEditingController();
+    controllerName = TextEditingController();
+    controllerSurName = TextEditingController();
+    controllerEmail = TextEditingController();
+    controllerPassword = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    controllerlevelUser.dispose();
+    controllerName.dispose();
+    controllerSurName.dispose();
+    controllerEmail.dispose();
+    controllerPassword.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     UserProvider userProvider = UserProvider.of(context) as UserProvider;
+    String title = userProvider.indexUser != null ? "Edit User" : "Create User";
 
-    int? index;
-    if (userProvider.indexUser != null) {
-      index = userProvider.indexUser;
-      controllerName.text = userProvider.userSelected!.name;
-      controllerEmail.text = userProvider.userSelected!.email;
-      controllerPassword.text = userProvider.userSelected!.password;
-      setState(() {
-        this.title = "Edit User";
-      });
-    }
-
-    void save() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    void save() {
       User user = User(
         level: controllerlevelUser.text,
         name: controllerName.text,
@@ -46,25 +52,13 @@ class _UserFormState extends State<AdmForm> {
         password: controllerPassword.text,
       );
 
-      List<String> userStrings = prefs.getStringList('users') ?? [];
-      userStrings.add(jsonEncode(user.toJson()));
-
-      prefs.setStringList('users', userStrings);
-
-      print(prefs);
-      if (index != null) {
-        userProvider.users[index] = user;
-      } else {
-        int usersLength = userProvider.users.length;
-        userProvider.users.insert(usersLength, user);
-      }
-
+      userProvider.saveUser(user);
       Navigator.popAndPushNamed(context, "/admList");
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.title),
+        title: Text(title),
         automaticallyImplyLeading: false,
         actions: [
           Container(
@@ -75,8 +69,9 @@ class _UserFormState extends State<AdmForm> {
               },
             ),
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(8))),
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+            ),
             margin: EdgeInsets.all(8),
           )
         ],
@@ -85,29 +80,39 @@ class _UserFormState extends State<AdmForm> {
         child: Column(
           children: [
             FieldForm(
-                label: "Level",
-                isPasword: false,
-                controller: controllerlevelUser),
+              label: "Level",
+              isPasword: false,
+              controller: controllerlevelUser,
+            ),
             FieldForm(
-                label: "Name", isPasword: false, controller: controllerName),
+              label: "Name",
+              isPasword: false,
+              controller: controllerName,
+            ),
             FieldForm(
-                label: "Surname",
-                isPasword: false,
-                controller: controllerSurName),
+              label: "Surname",
+              isPasword: false,
+              controller: controllerSurName,
+            ),
             FieldForm(
-                label: "Email", isPasword: false, controller: controllerEmail),
+              label: "Email",
+              isPasword: false,
+              controller: controllerEmail,
+            ),
             FieldForm(
-                label: "Password",
-                isPasword: true,
-                controller: controllerPassword),
+              label: "Password",
+              isPasword: true,
+              controller: controllerPassword,
+            ),
             SizedBox(
               width: double.infinity,
               child: TextButton(
                 onPressed: save,
                 child: Text("Salvar"),
                 style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(Theme.of(context).primaryColor),
+                  backgroundColor: MaterialStateProperty.all(
+                    Theme.of(context).primaryColor,
+                  ),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
                 ),
               ),
@@ -116,15 +121,16 @@ class _UserFormState extends State<AdmForm> {
               width: double.infinity,
               child: TextButton(
                 onPressed: () {
-                   Navigator.pop(context);
+                  Navigator.pop(context);
                 },
                 child: Text(
                   "Voltar ao Início",
                   style: TextStyle(color: Colors.red),
                 ),
                 style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(Colors.white.withOpacity(0.8)),
+                  backgroundColor: MaterialStateProperty.all(
+                    Colors.white.withOpacity(0.8),
+                  ),
                 ),
               ),
             ),

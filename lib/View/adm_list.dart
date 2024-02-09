@@ -4,6 +4,7 @@ import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/user_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class AdmList extends StatelessWidget {
   const AdmList({Key? key});
 
@@ -15,13 +16,12 @@ class AdmList extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-                Navigator.popAndPushNamed(context, "/createAdm");
-
+            Navigator.popAndPushNamed(context, "/createAdm");
           },
         ),
       ),
       body: FutureBuilder<List<User>>(
-        future: _fetchUsersFromSharedPreferences(),
+        future: UserRepo.fetchUsers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -35,7 +35,7 @@ class AdmList extends StatelessWidget {
               return ListView.builder(
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return _buildUserListItem(context, users[index], index);
+                  return UserListItem(user: users[index], index: index);
                 },
               );
             }
@@ -44,8 +44,16 @@ class AdmList extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildUserListItem(BuildContext context, User user, int index) {
+class UserListItem extends StatelessWidget {
+  final User user;
+  final int index;
+
+  const UserListItem({required this.user, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
     UserProvider userProvider = UserProvider.of(context) as UserProvider;
 
     return Container(
@@ -72,7 +80,7 @@ class AdmList extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                _deleteUser(index);
+                UserRepo.deleteUser(index);
               },
               icon: Icon(Icons.delete, color: Colors.red),
             ),
@@ -82,30 +90,27 @@ class AdmList extends StatelessWidget {
       decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 0.4))),
     );
   }
+}
 
-  Future<List<User>> _fetchUsersFromSharedPreferences() async {
+abstract class UserRepo {
+  static Future<List<User>> fetchUsers() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? userStrings = prefs.getStringList('users');
     if (userStrings == null) {
       return [];
     } else {
-      List<User> users = userStrings
-          .map((jsonString) => User.fromJson(jsonDecode(jsonString)))
-          .toList();
+      List<User> users = userStrings.map((jsonString) => User.fromJson(jsonDecode(jsonString))).toList();
       return users;
     }
   }
 
-  Future<void> _deleteUser(int index) async {
+  static Future<void> deleteUser(int index) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? userStrings = prefs.getStringList('users');
     if (userStrings != null) {
-      List<User> users = userStrings
-          .map((jsonString) => User.fromJson(jsonDecode(jsonString)))
-          .toList();
+      List<User> users = userStrings.map((jsonString) => User.fromJson(jsonDecode(jsonString))).toList();
       users.removeAt(index);
-      List<String> updatedUserStrings =
-          users.map((user) => jsonEncode(user.toJson())).toList();
+      List<String> updatedUserStrings = users.map((user) => jsonEncode(user.toJson())).toList();
       await prefs.setStringList('users', updatedUserStrings);
     }
   }

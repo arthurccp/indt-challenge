@@ -1,34 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/filed_form.dart';
 import 'package:indt_challenge/View/user_provider.dart';
 
 class UserView extends StatelessWidget {
-  UserView({super.key});
-
-  String title = "Show User";
-  TextEditingController controllerLevelUser = TextEditingController();
-  TextEditingController controllerName = TextEditingController();
-  TextEditingController controllerSurName = TextEditingController();
-  TextEditingController controllerEmail = TextEditingController();
-  TextEditingController controllerPassword = TextEditingController();
+  UserView({Key? key});
 
   @override
   Widget build(BuildContext context) {
-    UserProvider userProvider = UserProvider.of(context) as UserProvider;
+    final UserProvider userProvider = UserProvider.of(context) as UserProvider;
 
-    int? index;
-    if (userProvider.indexUser != null) {
-      index = userProvider.indexUser;
-      controllerLevelUser.text = userProvider.userSelected!.level;
-      controllerName.text = userProvider.userSelected!.name;
-      controllerSurName.text = userProvider.userSelected!.surname;
-      controllerEmail.text = userProvider.userSelected!.email;
-      controllerPassword.text = userProvider.userSelected!.password;
-    }
+    final User? user = userProvider.userSelected;
+    final int? index = userProvider.indexUser;
+
+    TextEditingController controllerLevelUser = TextEditingController(text: user?.level ?? '');
+    TextEditingController controllerName = TextEditingController(text: user?.name ?? '');
+    TextEditingController controllerSurName = TextEditingController(text: user?.surname ?? '');
+    TextEditingController controllerEmail = TextEditingController(text: user?.email ?? '');
+    TextEditingController controllerPassword = TextEditingController(text: user?.password ?? '');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.title),
+        title: Text("Show User"),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -44,8 +37,8 @@ class UserView extends StatelessWidget {
               },
             ),
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(8))),
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(8))),
             margin: EdgeInsets.all(8),
           )
         ],
@@ -54,30 +47,35 @@ class UserView extends StatelessWidget {
         child: Column(
           children: [
             FieldForm(
-                label: "Level",
-                isPasword: false,
-                controller: controllerLevelUser,
-                isForm: false),
+              label: "Level",
+              isPasword: false,
+              controller: controllerLevelUser,
+              isForm: false,
+            ),
             FieldForm(
-                label: "Name",
-                isPasword: false,
-                controller: controllerName,
-                isForm: false),
+              label: "Name",
+              isPasword: false,
+              controller: controllerName,
+              isForm: false,
+            ),
             FieldForm(
-                label: "SurName",
-                isPasword: false,
-                controller: controllerSurName,
-                isForm: false),
+              label: "SurName",
+              isPasword: false,
+              controller: controllerSurName,
+              isForm: false,
+            ),
             FieldForm(
-                label: "Email",
-                isPasword: false,
-                controller: controllerEmail,
-                isForm: false),
+              label: "Email",
+              isPasword: false,
+              controller: controllerEmail,
+              isForm: false,
+            ),
             FieldForm(
-                label: "Password",
-                isPasword: false,
-                controller: controllerPassword,
-                isForm: false),
+              label: "Password",
+              isPasword: false,
+              controller: controllerPassword,
+              isForm: false,
+            ),
             SizedBox(
               width: double.infinity,
               child: TextButton(
@@ -86,8 +84,7 @@ class UserView extends StatelessWidget {
                 },
                 child: Text("Edit"),
                 style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(Theme.of(context).primaryColor),
+                  backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
                 ),
               ),
@@ -96,8 +93,7 @@ class UserView extends StatelessWidget {
               width: double.infinity,
               child: TextButton(
                 onPressed: () {
-                  userProvider.indexUser = null;
-                  userProvider.users.removeAt(index!);
+                  _deleteUser(userProvider, index);
                   Navigator.popAndPushNamed(context, "/createAdm");
                 },
                 child: Text("delete"),
@@ -111,5 +107,12 @@ class UserView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _deleteUser(UserProvider userProvider, int? index) {
+    if (index != null) {
+      userProvider.indexUser = null;
+      userProvider.users.removeAt(index);
+    }
   }
 }

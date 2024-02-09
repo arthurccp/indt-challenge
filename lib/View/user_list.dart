@@ -21,13 +21,21 @@ class _UserListState extends State<UserList> {
   }
 
   Future<void> _fetchUsersFromSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? userStrings = prefs.getStringList('users');
+    final List<User> loadedUsers = await _loadUsersFromSharedPreferences();
+    setState(() {
+      users = loadedUsers;
+    });
+  }
+
+  Future<List<User>> _loadUsersFromSharedPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final List<String>? userStrings = prefs.getStringList('users');
     if (userStrings != null) {
-      List<User> loadedUsers = userStrings.map((jsonString) => User.fromJson(jsonDecode(jsonString))).toList();
-      setState(() {
-        users = loadedUsers;
-      });
+      return userStrings
+          .map((jsonString) => User.fromJson(jsonDecode(jsonString)))
+          .toList();
+    } else {
+      return [];
     }
   }
 
@@ -36,7 +44,6 @@ class _UserListState extends State<UserList> {
     return Scaffold(
       appBar: AppBar(
         title: Text("User List"),
-
       ),
       body: ListView.builder(
         itemCount: users.length + 1, // +1 para adicionar o botão de voltar ao início
@@ -67,13 +74,17 @@ class _UserListState extends State<UserList> {
       child: Center(
         child: ElevatedButton(
           onPressed: () {
-            UserProvider userProvider = UserProvider.of(context) as UserProvider;
-            userProvider.indexUser = null;
-            Navigator.popAndPushNamed(context, "/createAdm");
+            _navigateBackToStart(context);
           },
           child: Text('Voltar ao início'),
         ),
       ),
     );
+  }
+
+  void _navigateBackToStart(BuildContext context) {
+    final UserProvider userProvider = UserProvider.of(context) as UserProvider;
+    userProvider.indexUser = null;
+    Navigator.pop(context);
   }
 }

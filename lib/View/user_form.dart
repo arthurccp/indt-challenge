@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/filed_form.dart';
@@ -38,10 +37,8 @@ class _UserFormState extends State<UserForm> {
         this.title = "Edit User";
       });
     }
-    
-    void save() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    void save() async {
       User user = User(
         level: controllerlevelUser.text,
         name: controllerName.text,
@@ -50,12 +47,8 @@ class _UserFormState extends State<UserForm> {
         password: controllerPassword.text,
       );
 
-      List<String> userStrings = prefs.getStringList('users') ?? [];
-      userStrings.add(jsonEncode(user.toJson()));
+      await _saveUser(user);
 
-      prefs.setStringList('users', userStrings);
-
-      print(prefs);
       if (index != null) {
         userProvider.users[index] = user;
       } else {
@@ -130,5 +123,14 @@ class _UserFormState extends State<UserForm> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveUser(User user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<String> userStrings = prefs.getStringList('users') ?? [];
+    userStrings.add(jsonEncode(user.toJson()));
+
+    await prefs.setStringList('users', userStrings);
   }
 }

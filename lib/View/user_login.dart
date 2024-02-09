@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,11 +9,24 @@ class UserLogin extends StatelessWidget {
   static const String _adminPassword = 'admin';
 
   Future<void> login(BuildContext context, String username, String password) async {
-    if (username == _adminUsername && password == _adminPassword) {
+    if (await _isAdmin(username, password)) {
       Navigator.pushNamed(context, '/createAdm');
       return;
     }
 
+    if (await _isUserValid(username, password)) {
+      Navigator.pushNamed(context, '/userList');
+      return;
+    }
+
+    _showInvalidCredentialsDialog(context);
+  }
+
+  Future<bool> _isAdmin(String username, String password) async {
+    return username == _adminUsername && password == _adminPassword;
+  }
+
+  Future<bool> _isUserValid(String username, String password) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? userStrings = prefs.getStringList('users');
 
@@ -25,12 +37,15 @@ class UserLogin extends StatelessWidget {
         String? savedPassword = userMap['password'];
 
         if (username == savedUsername && password == savedPassword) {
-          Navigator.pushNamed(context, '/userList');
-          return;
+          return true;
         }
       }
     }
 
+    return false;
+  }
+
+  void _showInvalidCredentialsDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

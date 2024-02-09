@@ -7,11 +7,14 @@ class FieldForm extends StatelessWidget {
   bool? isForm = true;
 
   FieldForm(
-      {required this.label,
+      {
+      required this.label,
       required this.isPasword,
       required this.controller,
       this.isForm,
-      super.key});
+      super.key
+    }
+  );
 
   @override
   Widget build(BuildContext context) {
