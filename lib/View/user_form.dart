@@ -67,7 +67,6 @@ class _UserFormState extends State<UserForm> {
         userProvider.users.insert(usersLength, user);
       }
 
-      // Após salvar os dados, você pode navegar de volta para a tela de login
       Navigator.popAndPushNamed(context, "/login");
     }
 

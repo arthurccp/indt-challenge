@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:indt_challenge/Model/user.dart';
+import 'package:indt_challenge/View/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class UserProvider extends InheritedWidget {
+class UserProvider extends InheritedWidget with ChangeNotifier {
   final Widget child;
   List<User> users = [];
   User? userSelected;
@@ -15,13 +18,17 @@ class UserProvider extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<UserProvider>();
   }
 
-  bool updateShouldNotify(UserProvider widget) {
-    return true;
-  }
-
   // Método para atualizar a lista de usuários
-  void setUsers(List<User> newUsers) {
+  void updateUsers(List<User> newUsers) {
     users.clear();
     users.addAll(newUsers);
+    notifyListeners(); // Notificar os ouvintes sobre a mudança
+  }
+
+  @override
+  bool updateShouldNotify(UserProvider oldWidget) {
+    return users != oldWidget.users ||
+           userSelected != oldWidget.userSelected ||
+           indexUser != oldWidget.indexUser;
   }
 }

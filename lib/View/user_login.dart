@@ -25,7 +25,7 @@ class UserLogin extends StatelessWidget {
         String? savedPassword = userMap['password'];
 
         if (username == savedUsername && password == savedPassword) {
-          Navigator.pushNamed(context, '/createAdm');
+          Navigator.pushNamed(context, '/userList');
           return;
         }
       }

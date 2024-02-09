@@ -65,7 +65,7 @@ class AdmList extends StatelessWidget {
             ),
             IconButton(
               onPressed: () {
-                _deleteUser(context, user, index);
+                _deleteUser(index);
               },
               icon: Icon(Icons.delete, color: Colors.red),
             ),
@@ -89,17 +89,17 @@ class AdmList extends StatelessWidget {
     }
   }
 
-  void _deleteUser(BuildContext context, User user, int index) async {
-    UserProvider userProvider = UserProvider.of(context) as UserProvider;
-    userProvider.indexUser = index;
-    userProvider.userSelected = user;
-    userProvider.users.removeAt(index);
-
+  Future<void> _deleteUser(int index) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> userStrings =
-        userProvider.users.map((user) => jsonEncode(user.toJson())).toList();
-    prefs.setStringList('users', userStrings);
-
-    Navigator.popAndPushNamed(context, "/createAdm");
+    List<String>? userStrings = prefs.getStringList('users');
+    if (userStrings != null) {
+      List<User> users = userStrings
+          .map((jsonString) => User.fromJson(jsonDecode(jsonString)))
+          .toList();
+      users.removeAt(index);
+      List<String> updatedUserStrings =
+          users.map((user) => jsonEncode(user.toJson())).toList();
+      await prefs.setStringList('users', updatedUserStrings);
+    }
   }
 }
