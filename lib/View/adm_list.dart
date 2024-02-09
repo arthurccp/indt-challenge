@@ -88,7 +88,6 @@ class AdmList extends StatelessWidget {
       return users;
     }
   }
-
   Future<void> _deleteUser(int index) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? userStrings = prefs.getStringList('users');
@@ -102,4 +101,6 @@ class AdmList extends StatelessWidget {
       await prefs.setStringList('users', updatedUserStrings);
     }
   }
+
+
 }
