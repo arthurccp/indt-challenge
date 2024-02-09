@@ -29,6 +29,12 @@ class UserView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(this.title),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: [
           Container(
             child: TextButton(

@@ -18,4 +18,10 @@ class UserProvider extends InheritedWidget {
   bool updateShouldNotify(UserProvider widget) {
     return true;
   }
+
+  // Método para atualizar a lista de usuários
+  void setUsers(List<User> newUsers) {
+    users.clear();
+    users.addAll(newUsers);
+  }
 }

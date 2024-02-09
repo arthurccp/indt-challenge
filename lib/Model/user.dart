@@ -15,7 +15,6 @@ class User {
     }
   );
 
-   // Método para converter um mapa (JSON) em uma instância de User
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       level: json['level'],
@@ -26,7 +25,6 @@ class User {
     );
   }
 
-  // Método para converter uma instância de User em um mapa (JSON)
   Map<String, dynamic> toJson() {
     return {
       'level': level,

@@ -39,7 +39,7 @@ class _UserFormState extends State<AdmForm> {
 
     void save() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-
+      
       User user = User(
         level: controllerlevelUser.text,
         name: controllerName.text,
@@ -53,6 +53,7 @@ class _UserFormState extends State<AdmForm> {
 
       prefs.setStringList('users', userStrings);
 
+      print(prefs);
       if (index != null) {
         userProvider.users[index] = user;
       } else {
@@ -62,7 +63,6 @@ class _UserFormState extends State<AdmForm> {
 
       Navigator.popAndPushNamed(context, "/admList");
     }
-
 
     return Scaffold(
       appBar: AppBar(

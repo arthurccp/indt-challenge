@@ -1,100 +1,105 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:indt_challenge/Model/user.dart';
 import 'package:indt_challenge/View/user_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
-class AdmList extends StatefulWidget {
+class AdmList extends StatelessWidget {
   const AdmList({Key? key});
 
   @override
-  State<AdmList> createState() => _AdmListState();
-}
-
-class _AdmListState extends State<AdmList> {
-  List<String> userNames = []; // Lista para armazenar apenas os nomes dos usuários
-
-  @override
-  void initState() {
-    super.initState();
-    loadUserNames(); // Carrega os nomes dos usuários ao inicializar o widget
-  }
-
-  // Método para carregar apenas os nomes dos usuários
-  void loadUserNames() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? userStrings = prefs.getStringList('users');
-
-    if (userStrings != null) {
-      setState(() {
-        userNames = userStrings.map((userString) {
-          User user = User.fromJson(jsonDecode(userString));
-          return user.name; // Adiciona apenas o nome à lista
-        }).toList();
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    UserProvider userProvider = UserProvider.of(context) as UserProvider;
-
     return Scaffold(
       appBar: AppBar(
         title: Text("ADM List"),
-        leading: BackButton(
-          onPressed: () {
-            userProvider.indexUser = null;
-            Navigator.popAndPushNamed(context, "/createAdm");
-          },
-        ),
       ),
-      body: ListView.builder(
-        itemCount: userNames.length,
-        itemBuilder: (BuildContext context, int index) => ListTile(
-          title: Text(userNames[index]),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                onPressed: () {
-                  userProvider.indexUser = null;
-                  userProvider.userSelected = User(name: userNames[index], level: '', surname: '', email: '', password: '',); // Ajuste necessário
-                  userProvider.indexUser = index;
-                  Navigator.popAndPushNamed(context, "/createAdm");
+      body: FutureBuilder<List<User>>(
+        future: _fetchUsersFromSharedPreferences(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else {
+            final List<User>? users = snapshot.data;
+            if (users == null || users.isEmpty) {
+              return Center(child: Text("No users found"));
+            } else {
+              return ListView.builder(
+                itemCount: users.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _buildUserListItem(context, users[index], index);
                 },
-                icon: Icon(Icons.edit),
-              ),
-              IconButton(
-                onPressed: () {
-                  userProvider.indexUser = null;
-                  userProvider.userSelected = User(name: userNames[index], level: '', surname: '', email: '', password: ''); // Ajuste necessário
-                  userProvider.indexUser = index;
-                  Navigator.popAndPushNamed(context, "/view");
-                },
-                icon: Icon(Icons.visibility, color: Colors.blue),
-              ),
-              IconButton(
-                onPressed: () {
-                  userProvider.indexUser = null;
-                  setState(() {
-                    userNames.removeAt(index);
-                  });
-                  saveUserNamesToSharedPreferences(); // Atualiza a lista de nomes salva no SharedPreferences
-                },
-                icon: Icon(Icons.delete, color: Colors.red),
-              ),
-            ],
-          ),
-        ),
+              );
+            }
+          }
+        },
       ),
     );
   }
 
-  // Método para salvar a lista de nomes de usuários no SharedPreferences
-  void saveUserNamesToSharedPreferences() async {
+  Widget _buildUserListItem(BuildContext context, User user, int index) {
+    UserProvider userProvider = UserProvider.of(context) as UserProvider;
+
+    return Container(
+      child: ListTile(
+        title: Text(user.name),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              onPressed: () {
+                userProvider.indexUser = index;
+                userProvider.userSelected = user;
+                Navigator.popAndPushNamed(context, "/createAdm");
+              },
+              icon: Icon(Icons.edit),
+            ),
+            IconButton(
+              onPressed: () {
+                userProvider.indexUser = index;
+                userProvider.userSelected = user;
+                Navigator.popAndPushNamed(context, "/view");
+              },
+              icon: Icon(Icons.visibility, color: Colors.blue),
+            ),
+            IconButton(
+              onPressed: () {
+                _deleteUser(context, user, index);
+              },
+              icon: Icon(Icons.delete, color: Colors.red),
+            ),
+          ],
+        ),
+      ),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 0.4))),
+    );
+  }
+
+  Future<List<User>> _fetchUsersFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> userStrings = userNames.map((userName) => '{"name": "$userName"}').toList(); // Formata o nome como JSON
+    List<String>? userStrings = prefs.getStringList('users');
+    if (userStrings == null) {
+      return [];
+    } else {
+      List<User> users = userStrings
+          .map((jsonString) => User.fromJson(jsonDecode(jsonString)))
+          .toList();
+      return users;
+    }
+  }
+
+  void _deleteUser(BuildContext context, User user, int index) async {
+    UserProvider userProvider = UserProvider.of(context) as UserProvider;
+    userProvider.indexUser = index;
+    userProvider.userSelected = user;
+    userProvider.users.removeAt(index);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> userStrings =
+        userProvider.users.map((user) => jsonEncode(user.toJson())).toList();
     prefs.setStringList('users', userStrings);
+
+    Navigator.popAndPushNamed(context, "/createAdm");
   }
 }

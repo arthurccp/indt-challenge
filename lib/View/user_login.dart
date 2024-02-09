@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserLogin extends StatelessWidget {
   const UserLogin({Key? key});
 
-  // Função para realizar o login
-  void login(BuildContext context, String username, String password) {
-    // Substitua esta lógica com sua própria validação de credenciais
-    // Aqui, estou apenas comparando com credenciais fixas.
-    if (username == 'admin' && password == 'admin') {
-      // Se as credenciais estiverem corretas, navegue para a próxima tela.
+  static const String _adminUsername = 'admin';
+  static const String _adminPassword = 'admin';
+
+  Future<void> login(BuildContext context, String username, String password) async {
+    if (username == _adminUsername && password == _adminPassword) {
+      Navigator.pushNamed(context, '/createAdm');
+      return;
+    }
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(prefs);
+    String? savedUsername = prefs.getString('name');
+    String? savedPassword = prefs.getString('password');
+
+    if (username == savedUsername && password == savedPassword) {
       Navigator.pushNamed(context, '/createAdm');
     } else {
-      // Caso contrário, exiba uma mensagem de erro.
       showDialog(
         context: context,
         builder: (BuildContext context) {
