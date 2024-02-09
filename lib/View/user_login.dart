@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,31 +16,38 @@ class UserLogin extends StatelessWidget {
     }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(prefs);
-    String? savedUsername = prefs.getString('name');
-    String? savedPassword = prefs.getString('password');
+    List<String>? userStrings = prefs.getStringList('users');
 
-    if (username == savedUsername && password == savedPassword) {
-      Navigator.pushNamed(context, '/createAdm');
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Erro de login'),
-            content: Text('Credenciais inválidas. Por favor, tente novamente.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+    if (userStrings != null) {
+      for (String userString in userStrings) {
+        Map<String, dynamic> userMap = jsonDecode(userString);
+        String? savedUsername = userMap['name'];
+        String? savedPassword = userMap['password'];
+
+        if (username == savedUsername && password == savedPassword) {
+          Navigator.pushNamed(context, '/createAdm');
+          return;
+        }
+      }
     }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Erro de login'),
+          content: Text('Credenciais inválidas. Por favor, tente novamente.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
