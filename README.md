@@ -1,6 +1,22 @@
 # indt_challenge
 
-A new Flutter project.
+Este é um aplicativo desenvolvido como parte do desafio da Indt. O objetivo deste aplicativo é fornecer funcionalidades básicas para gerenciamento de usuários, incluindo a criação, edição, visualização e exclusão de usuários.
+
+# Funcionalidades:
+
+- Login de Usuário:
+
+Os usuários podem fazer login fornecendo um nome de usuário e senha.
+Um usuário administrador predefinido ("admin") está disponível para acessar áreas administrativas.
+- Gerenciamento de Usuários:
+
+Os usuários podem ser criados, editados, visualizados e excluídos.
+Os usuários são armazenados localmente usando Shared Preferences.
+
+# Dependências do Projeto:
+
+flutter: ^2.5.3
+shared_preferences: ^2.0.9
 
 ## Getting Started
 
